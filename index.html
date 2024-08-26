@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resizable Layout</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+        }
+        #left-block {
+            width: 300px;
+            background-color: lightblue;
+            position: relative;
+            transition: width 0.3s;
+        }
+        #content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #top-block, #bottom-block {
+            height: calc(50% - 10px);
+            background-color: lightgreen;
+        }
+        #resizer {
+            height: 20px;
+            background-color: grey;
+            cursor: row-resize;
+            text-align: center;
+            line-height: 20px;
+        }
+        #toggle-button {
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            width: 20px;
+            height: 40px;
+            background-color: grey;
+            cursor: pointer;
+            text-align: center;
+            line-height: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div id="left-block">
+        <div id="toggle-button">&#9664;</div>
+    </div>
+    <div id="content">
+        <div id="top-block"></div>
+        <div id="resizer">=</div>
+        <div id="bottom-block"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var isCollapsed = false;
+            $('#toggle-button').click(function() {
+                if (isCollapsed) {
+                    $('#left-block').css('width', '300px');
+                    $('#toggle-button').html('&#9664;'); // Left arrow
+                } else {
+                    $('#left-block').css('width', '0');
+                    $('#toggle-button').html('&#9654;'); // Right arrow
+                }
+                isCollapsed = !isCollapsed;
+            });
+
+            var isResizing = false;
+            var lastDownY = 0;
+
+            $('#resizer').mousedown(function(e) {
+                isResizing = true;
+                lastDownY = e.clientY;
+            });
+
+            $(document).mousemove(function(e) {
+                if (!isResizing) return;
+
+                var offset = e.clientY - lastDownY;
+                var topHeight = $('#top-block').height() + offset;
+                var bottomHeight = $('#bottom-block').height() - offset;
+
+                if (topHeight >= 100 && bottomHeight >= 100) {
+                    $('#top-block').css('height', topHeight + 'px');
+                    $('#bottom-block').css('height', bottomHeight + 'px');
+                    lastDownY = e.clientY;
+                }
+            });
+
+            $(document).mouseup(function() {
+                isResizing = false;
+            });
+        });
+    </script>
+</body>
+</html>
